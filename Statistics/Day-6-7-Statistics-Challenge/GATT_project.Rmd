@@ -1,0 +1,94 @@
+---
+title: "GATT Project"
+output: html_notebook
+---
+#LEGEND
+COLUMNS (365 in total):
+Year: year of trade
+
+General Outline
+
+Choose one of the 124 countries and conduct the research from that country’s perspective.
+
+The general outline for the briefing will be:
+
+Report on the state of the world economy and trade during ‘73-’79:
+What’s the average yearly GDP and per-capita GDP for the countries listed?
+
+```{r}
+repcode<-table(gatt_cln$rep_code)
+partcode<-table(gatt_cln$part_code)
+
+#126 rep code countries
+#124 part code countries
+
+install.packages("data.table")
+require(data.table)
+setDT(gatt_cln)[, .(count = uniqueN(gdp_rep)), by = year]
+
+
+
+
+
+
+
+```
+
+
+install.packages("tidyverse")
+require(tidyverse)
+
+install.packages("dplyr")
+require(dplyr)
+
+Which year registered the sharpest increase in the overall trade (is it better by chance?)?
+Repeat the analysis considering two subgroups: GATT vs non-GATT (or any other grouping of your choice)
+
+```{r}
+#lets sum the total trade per year
+
+agg<-aggregate(gatt_cln$trade, by=list(year=gatt_cln$year), FUN=sum)
+plot(agg,xlab="Year",ylab="Total Trade")
+
+agg_gatt<-aggregate(gatt_cln$trade, by=list(year=gatt_cln$year,gatt_member=gatt_cln$gatt_defacto_rep), FUN=sum)
+agg_gatt
+
+
+```
+
+```{r}
+# Which year registered the sharpest increase in the overall trade (is it better by chance?)?
+library(dplyr)
+gatt_c <- gatt_cln[(gatt_cln$gatt_defacto_rep == 1) | (gatt_cln$gatt_dejure_rep == 1), ]
+non_gatt_c <- gatt_cln[(gatt_cln$gatt_defacto_rep == 0) & (gatt_cln$gatt_dejure_rep == 0), ]
+nrow(gatt_c)
+nrow(gatt_c) + nrow(non_gatt_c)
+yearly_trade_gatt <- gatt_c %>%
+  group_by(year) %>%
+  summarise(mean_trade = mean(trade, na.rm = TRUE))
+yearly_trade_ngatt <- non_gatt_c %>%
+  group_by(year) %>%
+  summarise(mean_trade = mean(trade, na.rm = TRUE))
+yearly_trade_gatt
+yearly_trade_ngatt
+
+  
+```
+
+
+Use resampling methods to increase the robustness of the results
+Design and setup a regression model to justify:
+
+Whether your country need to join/leave the GATT
+Which commodity your investors should trade. (Which country and which commodity)
+Expand or modify your analysis as you see fit, add more research questions and use statistical methods
+
+
+
+
+
+
+
+
+
+
